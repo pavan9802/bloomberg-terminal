@@ -1,0 +1,390 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #0a0a0a;
+  color: #f59e0b;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 13px;
+}
+
+/* ── Dashboard ── */
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.dashboard-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1rem;
+  height: 40px;
+  background: #111;
+  border-bottom: 1px solid #f59e0b;
+  flex-shrink: 0;
+}
+
+.dashboard-title {
+  font-size: 14px;
+  font-weight: bold;
+  letter-spacing: 2px;
+  color: #f59e0b;
+}
+
+.toolbar-actions {
+  position: relative;
+}
+
+.add-widget-btn {
+  background: transparent;
+  border: 1px solid #f59e0b;
+  color: #f59e0b;
+  padding: 4px 10px;
+  font-family: inherit;
+  font-size: 11px;
+  cursor: pointer;
+  letter-spacing: 1px;
+}
+
+.add-widget-btn:hover {
+  background: #f59e0b;
+  color: #0a0a0a;
+}
+
+.add-widget-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 4px);
+  background: #111;
+  border: 1px solid #333;
+  z-index: 100;
+  min-width: 140px;
+}
+
+.add-widget-menu-section {
+  padding: 6px 12px 3px;
+  font-size: 9px;
+  letter-spacing: 1px;
+  color: #555;
+  border-top: 1px solid #1e1e1e;
+}
+
+.add-widget-menu-section:first-child {
+  border-top: none;
+}
+
+.add-widget-menu button {
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  background: transparent;
+  border: none;
+  color: #ccc;
+  font-family: inherit;
+  font-size: 12px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.add-widget-menu button:hover {
+  background: #1e1e1e;
+  color: #f59e0b;
+}
+
+.dashboard-grid {
+  height: calc(100vh - 40px);
+  overflow: hidden;
+  padding: 6px;
+}
+
+/* ── Widget container ── */
+.widget-container {
+  background: #111;
+  border: 1px solid #222;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* ── Resize handles ── */
+.resize-handle-col {
+  width: 5px;
+  background: #1e1e1e;
+  cursor: col-resize;
+  transition: background 0.15s;
+}
+
+.resize-handle-col[data-separator]:hover {
+  background: #f59e0b;
+}
+
+.resize-handle-row {
+  height: 5px;
+  background: #1e1e1e;
+  cursor: row-resize;
+  transition: background 0.15s;
+}
+
+.resize-handle-row[data-separator]:hover {
+  background: #f59e0b;
+}
+
+.widget-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 8px;
+  background: #161616;
+  border-bottom: 1px solid #222;
+  flex-shrink: 0;
+}
+
+.widget-title {
+  font-size: 11px;
+  letter-spacing: 1px;
+  color: #888;
+}
+
+.widget-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.widget-controls button {
+  background: transparent;
+  border: 1px solid #333;
+  color: #666;
+  width: 20px;
+  height: 20px;
+  font-size: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.widget-controls button:hover:not(:disabled) {
+  border-color: #f59e0b;
+  color: #f59e0b;
+}
+
+.widget-controls button:disabled {
+  opacity: 0.2;
+  cursor: default;
+}
+
+.widget-close:hover:not(:disabled) {
+  border-color: #ef4444 !important;
+  color: #ef4444 !important;
+}
+
+.widget-size {
+  font-size: 10px;
+  color: #444;
+  width: 22px;
+  text-align: center;
+}
+
+.widget-content {
+  flex: 1;
+  overflow: hidden;
+}
+
+/* ── ReactSearchBox overrides ── */
+.watchlist input {
+  font-family: 'Courier New', Courier, monospace;
+  letter-spacing: 1px;
+  border-radius: 0 !important;
+}
+
+.watchlist input::placeholder {
+  color: #444;
+}
+
+.watchlist input:focus {
+  outline: none;
+  border-color: #f59e0b !important;
+  box-shadow: 0 0 0 1px #f59e0b !important;
+}
+
+.react-search-box-dropdown {
+  background-color: #111 !important;
+  border: 1px solid #333;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  margin-top: 0 !important;
+}
+
+.react-search-box-dropdown-list-item {
+  background-color: #111 !important;
+  color: #888;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 11px;
+  letter-spacing: 1px;
+  height: 30px !important;
+  border-color: #222 !important;
+}
+
+.react-search-box-dropdown-list-item:hover {
+  color: #f59e0b !important;
+}
+
+/* ── PriceWidget ── */
+.price-widget {
+  display: flex;
+  height: 100%;
+}
+
+/* ── Watchlist ── */
+.watchlist {
+  height: 100%;
+  border-right: 1px solid #1e1e1e;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.watchlist-header {
+  padding: 6px 10px;
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: #555;
+  border-bottom: 1px solid #1e1e1e;
+}
+
+.watchlist-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 10px;
+  cursor: pointer;
+  border-bottom: 1px solid #161616;
+  transition: background 0.1s;
+}
+
+.watchlist-item:hover {
+  background: #161616;
+}
+
+.watchlist-item.active {
+  background: #1a1500;
+  border-left: 2px solid #f59e0b;
+}
+
+.wl-symbol {
+  font-weight: bold;
+  font-size: 12px;
+  color: #f59e0b;
+}
+
+.wl-price {
+  font-size: 11px;
+  color: #888;
+}
+
+/* ── Chart panel ── */
+.chart-panel {
+  height: 100%;
+  overflow: hidden;
+}
+
+.price-chart {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.chart-toolbar {
+  display: flex;
+  gap: 4px;
+  padding: 6px 8px;
+  border-bottom: 1px solid #1a1a1a;
+  flex-shrink: 0;
+}
+
+.chart-period-btn {
+  background: none;
+  border: 1px solid #2a2a2a;
+  color: #555;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 10px;
+  padding: 2px 8px;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  transition: all 0.1s;
+}
+
+.chart-period-btn:hover {
+  border-color: #444;
+  color: #888;
+}
+
+.chart-period-btn.active {
+  border-color: #f59e0b;
+  color: #f59e0b;
+}
+
+.chart-canvas {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+}
+
+.chart-spinner {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0a0a0a;
+  z-index: 1;
+}
+
+.chart-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #444;
+  font-size: 12px;
+}
+
+.chart-header {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 6px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #1e1e1e;
+}
+
+.chart-symbol {
+  font-size: 18px;
+  font-weight: bold;
+  color: #f59e0b;
+}
+
+.chart-price {
+  font-size: 20px;
+  color: #fff;
+}
+
+.chart-change {
+  font-size: 13px;
+}
+
+.chart-period {
+  margin-left: auto;
+  font-size: 10px;
+  color: #444;
+  letter-spacing: 1px;
+}
