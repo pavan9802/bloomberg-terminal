@@ -34,12 +34,13 @@ function applyBars(series: ISeriesApi<"Area">, bars: PriceBar[]) {
 }
 
 export default function PriceChart() {
-  const { selected: symbol } = usePriceWidget();
+  const { selected: symbol, watchlist, prices } = usePriceWidget();
   const containerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
   const seriesRef = useRef<ISeriesApi<"Area"> | null>(null);
   const [activePeriod, setActivePeriod] = useState<Period>(PERIODS[0]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const stateRef = useRef<ChartState>({
     symbol,
     period: PERIODS[0],
@@ -129,7 +130,12 @@ export default function PriceChart() {
   useEffect(() => {
     const series = seriesRef.current;
     if (!series) return;
+    if (!symbol || !watchlist.includes(symbol)) {
+      series.setData([]);
+      return;
+    }
 
+    const controller = new AbortController();
     const s = stateRef.current;
     s.symbol = symbol;
     s.period = activePeriod;
@@ -139,34 +145,57 @@ export default function PriceChart() {
 
     series.setData([]);
     setIsLoading(true);
+    setError(null);
 
-    marketApi.getHistory(symbol, activePeriod.interval, activePeriod.ranges[0])
+    marketApi.getHistory(symbol, activePeriod.interval, activePeriod.ranges[0], controller.signal)
       .then(bars => {
         if (!seriesRef.current) return;
         applyBars(seriesRef.current, bars);
         chartRef.current?.timeScale().fitContent();
       })
+      .catch(err => {
+        if (err.name !== "AbortError") setError(`Failed to load data for ${symbol}`);
+      })
       .finally(() => { s.loading = false; setIsLoading(false); });
+
+    return () => controller.abort();
   }, [symbol, activePeriod]);
 
   return (
     <div className="price-chart">
-      <div className="chart-toolbar">
-        {PERIODS.map(p => (
-          <button
-            key={p.label}
-            className={`chart-period-btn ${activePeriod.label === p.label ? "active" : ""}`}
-            onClick={() => setActivePeriod(p)}
-          >
-            {p.label}
-          </button>
-        ))}
-      </div>
-      <div ref={containerRef} className="chart-canvas">
+      {!symbol ? (
+        <div className="price-chart-empty">
+          <span>Add a symbol to your watchlist to see a chart.</span>
+        </div>
+      ) : (
+        <div className="chart-toolbar">
+          <div className="chart-symbol-info">
+            <span className="chart-symbol-name">{symbol}</span>
+            {prices[symbol] && (
+              <span className="chart-symbol-price">${prices[symbol].toFixed(2)}</span>
+            )}
+          </div>
+          <div className="chart-periods">
+            {PERIODS.map(p => (
+              <button
+                key={p.label}
+                className={`chart-period-btn ${activePeriod.label === p.label ? "active" : ""}`}
+                onClick={() => setActivePeriod(p)}
+              >
+                {p.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+      <div ref={containerRef} className="chart-canvas" style={{ visibility: symbol ? "visible" : "hidden" }}>
         {isLoading && (
           <div className="chart-spinner">
             <Loader size={24} color="gray" />
           </div>
+        )}
+        {error && !isLoading && (
+          <div className="chart-error">{error}</div>
         )}
       </div>
     </div>

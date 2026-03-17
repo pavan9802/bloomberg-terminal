@@ -12,6 +12,7 @@
     "@emotion/react": "^11.14.0",
     "@mantine/core": "^8.3.17",
     "@mantine/hooks": "^8.3.17",
+    "@tabler/icons-react": "^3.40.0",
     "lightweight-charts": "^5.1.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",

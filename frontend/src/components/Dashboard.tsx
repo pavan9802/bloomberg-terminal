@@ -1,4 +1,5 @@
 import { Fragment, useEffect, useState } from "react";
+import RemoveButton from "./RemoveButton";
 import { Group, Panel, Separator, useGroupRef } from "react-resizable-panels";
 import PriceWidget from "./PriceWidget";
 
@@ -52,7 +53,7 @@ function PanelRow({ row, onRemoveWidget }: PanelRowProps) {
             <div className="widget-header">
               <span className="widget-title">{WIDGET_LABELS[widget.type]}</span>
               <div className="widget-controls">
-                <button onClick={() => onRemoveWidget(widget.id)} title="Close" className="widget-close">✕</button>
+                <RemoveButton onClick={() => onRemoveWidget(widget.id)} />
               </div>
             </div>
             <div className="widget-content">

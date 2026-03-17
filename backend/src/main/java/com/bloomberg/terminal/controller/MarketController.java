@@ -31,16 +31,18 @@ public class MarketController {
 
     private final MarketDataService marketDataService;
 
-    private void validateSymbol(String symbol) {
-        if (!SYMBOL_PATTERN.matcher(symbol).matches())
+    private String validateSymbol(String symbol) {
+        String upper = symbol.toUpperCase();
+        if (!SYMBOL_PATTERN.matcher(upper).matches())
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid symbol: " + symbol);
+        return upper;
     }
 
     @GetMapping("/price/{symbol}")
     public StockSnapshot getPrice(@PathVariable String symbol) {
-        validateSymbol(symbol);
-        log.info("GET /api/market/price/{}", symbol);
-        return marketDataService.getPrice(symbol);
+        String sym = validateSymbol(symbol);
+        log.info("GET /api/market/price/{}", sym);
+        return marketDataService.getPrice(sym);
     }
 
     @GetMapping("/history/{symbol}")
@@ -48,19 +50,19 @@ public class MarketController {
             @PathVariable String symbol,
             @RequestParam(defaultValue = "1d") String interval,
             @RequestParam(defaultValue = "1mo") String range) {
-        validateSymbol(symbol);
+        String sym = validateSymbol(symbol);
         if (!VALID_INTERVALS.contains(interval))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid interval: " + interval);
         if (!VALID_RANGES.contains(range))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid range: " + range);
-        log.info("GET /api/market/history/{} interval={} range={}", symbol, interval, range);
-        return marketDataService.getHistory(symbol, interval, range);
+        log.info("GET /api/market/history/{} interval={} range={}", sym, interval, range);
+        return marketDataService.getHistory(sym, interval, range);
     }
 
     @GetMapping("/search/{symbol}")
     public Set<String> searchSymbols(@PathVariable String symbol) {
-        validateSymbol(symbol);
-        log.info("GET /api/market/search/{}", symbol);
-        return marketDataService.searchSymbols(symbol);
+        String sym = validateSymbol(symbol);
+        log.info("GET /api/market/search/{}", sym);
+        return marketDataService.searchSymbols(sym);
     }
 }

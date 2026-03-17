@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { Autocomplete, Loader } from "@mantine/core";
-
+import RemoveButton from "./RemoveButton";
 import { marketApi } from "../api/market";
 import { usePriceWidget } from "../context/PriceWidgetContext";
 import { useDebounce } from "../hooks/useDebounce";
@@ -10,28 +10,30 @@ export default function WatchList() {
   const [searchResults, setSearchResults] = useState<string[]>([]);
   const [selectCount, setSelectCount] = useState(0);
   const skipNextChange = useRef(false);
-  const { watchlist, prices, selected, setSelected, addSymbol } = usePriceWidget();
-  const debouncedQuery = useDebounce(query, 100);
-
-  useEffect(() => {
-    if (debouncedQuery) {
-      marketApi.searchSymbols(debouncedQuery)
-      .then(setSearchResults)
-      .catch(() => {
-        console.error("Error fetching search results");
-        setSearchResults([])
-      });
+  const { watchlist, prices, selected, setSelected, addSymbol, removeSymbol } = usePriceWidget();
+  
+  useDebounce(query, 100, (q) => {
+    if (q) {
+      marketApi.searchSymbols(q)
+        .then(setSearchResults)
+        .catch(() => {
+          console.error("Error fetching search results");
+          setSearchResults([]);
+        });
     } else {
       setSearchResults([]);
     }
-  }, [debouncedQuery]);
+  });
+
+  const [addError, setAddError] = useState<string | null>(null);
 
   const onSelect = (symbol: string): void => {
     skipNextChange.current = true;
     setQuery("");
     setSearchResults([]);
     setSelectCount(c => c + 1);
-    addSymbol(symbol);
+    setAddError(null);
+    addSymbol(symbol).catch(() => setAddError(`Failed to add ${symbol}`));
   };
 
   const handleChange = (value: string): void => {
@@ -71,16 +73,26 @@ export default function WatchList() {
           },
         }}
       />
-      {watchlist.map(symbol => (
+      {addError && <div className="watchlist-error">{addError}</div>}
+      {watchlist.length === 0 && (
+        <div className="watchlist-empty">Search for a symbol above to add it to your watchlist.</div>
+      )}
+      {watchlist.map((symbol: string) => (
         <div
           key={symbol}
           className={`watchlist-item ${selected === symbol ? "active" : ""}`}
           onClick={() => setSelected(symbol)}
         >
           <span className="wl-symbol">{symbol}</span>
-          <span className="wl-price">
-            {prices[symbol] ? `$${prices[symbol].toFixed(2)}` : <Loader size={10} color="gray" />}
-          </span>
+          <div className="wl-right">
+            <span className="wl-price">
+              {prices[symbol] ? `$${prices[symbol].toFixed(2)}` : <Loader size={10} color="gray" />}
+            </span>
+            <RemoveButton
+              onClick={() => removeSymbol(symbol)}
+              className="wl-remove"
+            />
+          </div>
         </div>
       ))}
     </div>

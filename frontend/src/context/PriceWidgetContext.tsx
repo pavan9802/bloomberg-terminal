@@ -8,8 +8,8 @@ interface PriceWidgetContextValue {
   prices: Record<string, number>;
   selected: string;
   setSelected: (symbol: string) => void;
-  setWatchlist: (list: string[]) => void;
-  addSymbol: (symbol: string) => void;
+  addSymbol: (symbol: string) => Promise<void>;
+  removeSymbol: (symbol: string) => void;
 }
 
 const PriceWidgetContext = createContext<PriceWidgetContextValue | null>(null);
@@ -20,26 +20,42 @@ export function PriceWidgetProvider({ children }: { children: React.ReactNode })
   const [selected, setSelected] = useState("AAPL");
 
   useEffect(() => {
-    watchlist.forEach((symbol) => {
-      marketApi.getPrice(symbol).then(price =>
-        setPrices(prev => ({ ...prev, [symbol]: price }))
-      );
-    });
-  }, []);
+    const fetchAll = () =>
+      Promise.all(watchlist.map(symbol =>
+        marketApi.getPrice(symbol).then(price => ({ symbol, price }))
+      )).then(results => {
+        setPrices(prev => {
+          const next = { ...prev };
+          results.forEach(({ symbol, price }) => { next[symbol] = price; });
+          return next;
+        });
+      });
+    fetchAll();
+    const id = setInterval(fetchAll, 30000);
+    return () => clearInterval(id);
+  }, [watchlist]);
 
-  const addSymbol = (symbol: string) => {
-    if (watchlist.includes(symbol)) return;
-    marketApi.getPrice(symbol)
+  const addSymbol = (symbol: string): Promise<void> => {
+    if (watchlist.includes(symbol)) return Promise.resolve();
+    return marketApi.getPrice(symbol)
       .then(price => {
         setWatchlist(prev => [...prev, symbol]);
         setPrices(prev => ({ ...prev, [symbol]: price }));
         setSelected(symbol);
-      })
-      .catch(err => console.error(`Failed to fetch price for ${symbol}:`, err));
+      });
+  };
+
+  useEffect(() => {
+    setSelected(prev => watchlist.includes(prev) ? prev : (watchlist[0] ?? ""));
+  }, [watchlist]);
+
+  const removeSymbol = (symbol: string) => {
+    setWatchlist(prev => prev.filter(s => s !== symbol));
+    setPrices(({ [symbol]: _, ...rest }) => rest);
   };
 
   return (
-    <PriceWidgetContext.Provider value={{ watchlist, prices, selected, setSelected, setWatchlist, addSymbol }}>
+    <PriceWidgetContext.Provider value={{ watchlist, prices, selected, setSelected, addSymbol, removeSymbol }}>
       {children}
     </PriceWidgetContext.Provider>
   );
