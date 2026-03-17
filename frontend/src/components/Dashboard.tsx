@@ -2,18 +2,7 @@ import { Fragment, useEffect, useState } from "react";
 import RemoveButton from "./RemoveButton";
 import { Group, Panel, Separator, useGroupRef } from "react-resizable-panels";
 import PriceWidget from "./PriceWidget";
-
-type WidgetType = "price";
-
-interface Widget {
-  id: string;
-  type: WidgetType;
-}
-
-interface Row {
-  id: string;
-  widgets: Widget[];
-}
+import { WidgetType, Row, PanelRowProps } from "../types/dashboard";
 
 const WIDGET_LABELS: Record<WidgetType, string> = {
   price: "Price Chart",
@@ -26,10 +15,6 @@ function renderWidget(type: WidgetType) {
   }
 }
 
-interface PanelRowProps {
-  row: Row;
-  onRemoveWidget: (widgetId: string) => void;
-}
 
 function PanelRow({ row, onRemoveWidget }: PanelRowProps) {
   const groupRef = useGroupRef();

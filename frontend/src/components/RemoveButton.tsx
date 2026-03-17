@@ -1,13 +1,6 @@
 import { ActionIcon } from "@mantine/core";
 import { IconX } from "@tabler/icons-react";
-
-interface RemoveButtonProps {
-  onClick: () => void;
-  size?: "xs" | "sm" | "md" | "lg" | "xl";
-  iconSize?: number;
-  className?: string;
-  ariaLabel?: string;
-}
+import { RemoveButtonProps } from "../types/components";
 
 export default function RemoveButton({
   onClick,

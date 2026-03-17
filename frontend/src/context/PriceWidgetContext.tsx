@@ -1,16 +1,8 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { marketApi } from "../api/market";
+import { PriceWidgetContextValue } from "../types/context";
 
 const WATCHLIST = ["AAPL", "GOOGL"];
-
-interface PriceWidgetContextValue {
-  watchlist: string[];
-  prices: Record<string, number>;
-  selected: string;
-  setSelected: (symbol: string) => void;
-  addSymbol: (symbol: string) => Promise<void>;
-  removeSymbol: (symbol: string) => void;
-}
 
 const PriceWidgetContext = createContext<PriceWidgetContextValue | null>(null);
 

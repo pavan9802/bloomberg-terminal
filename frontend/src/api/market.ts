@@ -1,16 +1,8 @@
+import { StockSnapshot, PriceBar } from "../types/market";
+
+export type { StockSnapshot, PriceBar };
+
 const BASE = "http://localhost:8080/api/market";
-
-export type StockSnapshot = {
-  price: number;
-  change: number;
-  percentChange: number;
-  high: number;
-  low: number;
-  open: number;
-  previousClose: number;
-};
-
-export type PriceBar = { date: string; price: number };
 
 export const marketApi = {
   getPrice: (symbol: string): Promise<number> =>

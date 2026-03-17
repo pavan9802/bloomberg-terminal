@@ -3,23 +3,7 @@ import { Loader } from "@mantine/core";
 import { createChart, ColorType, IChartApi, ISeriesApi, AreaSeries } from "lightweight-charts";
 import { marketApi, PriceBar } from "../api/market";
 import { usePriceWidget } from "../context/PriceWidgetContext";
-
-const PERIODS = [
-  { label: "1D", interval: "1d",  ranges: ["1mo", "3mo", "6mo", "1y", "2y", "5y", "max"] },
-  { label: "1W", interval: "1wk", ranges: ["1y", "2y", "5y", "10y", "max"] },
-  { label: "1M", interval: "1mo", ranges: ["5y", "10y", "max"] },
-];
-
-type Period = typeof PERIODS[number];
-
-// Mutable ref bag — shared with the scroll handler to avoid stale closures
-interface ChartState {
-  symbol: string;
-  period: Period;
-  rangeIndex: number;
-  loading: boolean;
-  exhausted: boolean;
-}
+import { PERIODS, Period, ChartState } from "../types/chart";
 
 function applyBars(series: ISeriesApi<"Area">, bars: PriceBar[]) {
   if (bars.length === 0) return;
