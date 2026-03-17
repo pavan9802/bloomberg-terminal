@@ -1,0 +1,13 @@
+server:
+  port: 8080
+
+# spring:
+#   datasource:
+#     url: jdbc:postgresql://localhost:5432/bloomberg_terminal
+#     username: ${DB_USERNAME:postgres}
+#     password: ${DB_PASSWORD:postgres}
+#   jpa:
+#     hibernate:
+#       ddl-auto: update
+#     show-sql: true
+
