@@ -2,7 +2,11 @@ import { StockSnapshot, PriceBar } from "../types/market";
 
 export type { StockSnapshot, PriceBar };
 
-const BASE = "http://localhost:8080/api/market";
+// Use environment variable for production, fallback to relative URL for local/docker
+// VITE_API_URL should be set to your Railway backend URL in production
+// e.g., "https://bloomberg-backend-production.up.railway.app"
+const API_URL = import.meta.env.VITE_API_URL || "";
+const BASE = `${API_URL}/api/market`;
 
 export const marketApi = {
   getPrice: (symbol: string): Promise<number> =>

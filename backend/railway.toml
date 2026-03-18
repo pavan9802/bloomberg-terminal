@@ -1,0 +1,21 @@
+# ============================================================
+# RAILWAY CONFIGURATION - Backend
+# ============================================================
+# This tells Railway to use our Dockerfile instead of
+# trying to auto-detect the build system.
+# ============================================================
+
+[build]
+# Use the Dockerfile in this directory
+builder = "dockerfile"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+# Health check endpoint
+healthcheckPath = "/api/market/price/AAPL"
+healthcheckTimeout = 30
+# Number of instances
+numReplicas = 1
+# Restart policy
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 3
