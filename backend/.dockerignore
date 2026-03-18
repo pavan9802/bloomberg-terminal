@@ -1,0 +1,40 @@
+# ============================================================
+# BACKEND .dockerignore
+# ============================================================
+# This file tells Docker which files to IGNORE when building.
+# Like .gitignore, but for Docker.
+#
+# Why ignore files?
+# 1. Smaller build context = faster builds
+# 2. Avoid copying unnecessary files into the image
+# 3. Prevent sensitive files from being included
+# ============================================================
+
+# Maven build output (we build fresh in Docker)
+target/
+
+# IDE settings (not needed in container)
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+
+# Git (not needed in container)
+.git/
+.gitignore
+
+# Environment files (may contain secrets!)
+.env
+.env.*
+
+# Documentation (not needed at runtime)
+*.md
+docs/
+
+# Test files (we skip tests in Docker build)
+src/test/
+
+# OS files
+.DS_Store
+Thumbs.db

@@ -1,0 +1,254 @@
+# ============================================================
+# GITHUB ACTIONS - CI/CD PIPELINE
+# ============================================================
+# GitHub Actions automatically runs this workflow when you
+# push code or create a pull request. It:
+#
+#   1. Tests your code (runs tests, type checks)
+#   2. Builds Docker images
+#   3. Pushes images to Docker Hub (container registry)
+#   4. Deploys to Railway (or your chosen platform)
+#
+# This file lives at: .github/workflows/ci-cd.yml
+# ============================================================
+
+# "name" appears in GitHub's Actions tab
+name: CI/CD Pipeline
+
+# ============================================================
+# TRIGGERS - When does this workflow run?
+# ============================================================
+on:
+  # Run on push to main branch
+  push:
+    branches:
+      - main
+
+  # Run on pull requests to main branch
+  # This lets you test changes BEFORE merging
+  pull_request:
+    branches:
+      - main
+
+  # Allow manual trigger from GitHub UI
+  # Useful for re-running deployments
+  workflow_dispatch:
+
+# ============================================================
+# ENVIRONMENT VARIABLES
+# ============================================================
+# Variables available to all jobs in this workflow
+env:
+  # Docker Hub username (set this in GitHub repo secrets)
+  DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+
+  # Image names on Docker Hub
+  BACKEND_IMAGE: ${{ secrets.DOCKER_USERNAME }}/bloomberg-backend
+  FRONTEND_IMAGE: ${{ secrets.DOCKER_USERNAME }}/bloomberg-frontend
+
+# ============================================================
+# JOBS - The actual work to perform
+# ============================================================
+jobs:
+  # ----------------------------------------------------------
+  # JOB 1: TEST BACKEND
+  # ----------------------------------------------------------
+  test-backend:
+    # "runs-on" specifies the virtual machine to use
+    # "ubuntu-latest" is a free Linux VM provided by GitHub
+    runs-on: ubuntu-latest
+
+    # "defaults" sets default options for all steps
+    defaults:
+      run:
+        # Run all commands from the backend directory
+        working-directory: ./backend
+
+    steps:
+      # Step 1: Download your code onto the VM
+      # "uses" runs a pre-built action from GitHub Marketplace
+      # "actions/checkout@v4" clones your repository
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Step 2: Install Java 21 on the VM
+      # "actions/setup-java@v4" installs and configures Java
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          # Java version to install
+          java-version: "21"
+          # Distribution (temurin = Eclipse Adoptium, free & reliable)
+          distribution: "temurin"
+          # Cache Maven dependencies for faster builds
+          cache: "maven"
+
+      # Step 3: Run tests
+      # "mvn verify" compiles code and runs all tests
+      # "-B" = batch mode (no interactive prompts)
+      - name: Run tests
+        run: mvn verify -B
+
+  # ----------------------------------------------------------
+  # JOB 2: TEST FRONTEND
+  # ----------------------------------------------------------
+  test-frontend:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ./frontend
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Install Node.js 20 with npm caching
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          # Cache npm dependencies based on package-lock.json
+          cache: "npm"
+          cache-dependency-path: ./frontend/package-lock.json
+
+      # Install dependencies from package.json
+      - name: Install dependencies
+        run: npm ci
+        # "npm ci" is like "npm install" but:
+        # - Faster (skips some checks)
+        # - Stricter (fails if lock file is out of sync)
+        # - Preferred for CI environments
+
+      # Run TypeScript compiler to check for type errors
+      # "tsc --noEmit" checks types without creating output files
+      - name: Type check
+        run: npx tsc --noEmit
+
+      # Build production bundle to ensure it compiles
+      - name: Build
+        run: npm run build
+
+  # ----------------------------------------------------------
+  # JOB 3: BUILD AND PUSH DOCKER IMAGES
+  # ----------------------------------------------------------
+  build-and-push:
+    # Only run after tests pass
+    needs: [test-backend, test-frontend]
+
+    # Only run on push to main (not on PRs)
+    # PRs just run tests, they don't deploy
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Set up Docker Buildx (advanced Docker builder)
+      # Buildx provides better caching and multi-platform builds
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # Log in to Docker Hub so we can push images
+      # Credentials come from GitHub Secrets
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      # Build and push backend image
+      - name: Build and push backend
+        uses: docker/build-push-action@v5
+        with:
+          # Build context (folder with Dockerfile)
+          context: ./backend
+          # Push to Docker Hub after building
+          push: true
+          # Image name and tags
+          # We tag with both "latest" and the git commit SHA
+          # SHA tag lets you deploy specific versions
+          tags: |
+            ${{ env.BACKEND_IMAGE }}:latest
+            ${{ env.BACKEND_IMAGE }}:${{ github.sha }}
+          # Cache layers to speed up future builds
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      # Build and push frontend image
+      - name: Build and push frontend
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          push: true
+          tags: |
+            ${{ env.FRONTEND_IMAGE }}:latest
+            ${{ env.FRONTEND_IMAGE }}:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # ----------------------------------------------------------
+  # JOB 4: DEPLOY TO RAILWAY
+  # ----------------------------------------------------------
+  # Railway automatically deploys when you push Docker images,
+  # OR you can trigger deployment via their CLI.
+  #
+  # OPTION A: Connect Railway to your GitHub repo directly
+  #           (Railway watches for pushes and auto-deploys)
+  #
+  # OPTION B: Use this job to deploy via Railway CLI
+  # ----------------------------------------------------------
+  deploy:
+    needs: [build-and-push]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Install Railway CLI
+      - name: Install Railway CLI
+        run: npm install -g @railway/cli
+
+      # Deploy backend to Railway
+      # RAILWAY_TOKEN comes from GitHub Secrets
+      - name: Deploy backend to Railway
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        run: |
+          cd backend
+          railway up --service backend
+        # Note: You may need to adjust the service name
+
+      # Deploy frontend to Railway
+      - name: Deploy frontend to Railway
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        run: |
+          cd frontend
+          railway up --service frontend
+
+# ============================================================
+# SETUP INSTRUCTIONS
+# ============================================================
+#
+# 1. Create a Docker Hub account at https://hub.docker.com
+#
+# 2. Add these secrets to your GitHub repo:
+#    Go to: Repo Settings → Secrets → Actions → New repository secret
+#
+#    DOCKER_USERNAME: Your Docker Hub username
+#    DOCKER_PASSWORD: Docker Hub access token (not password!)
+#                     Create at: Docker Hub → Account Settings → Security
+#    RAILWAY_TOKEN:   Get from Railway dashboard → Account Settings → Tokens
+#
+# 3. Connect Railway to your GitHub repo:
+#    - Create new project on Railway
+#    - Add services for "backend" and "frontend"
+#    - Either connect to GitHub (auto-deploy) or use the CLI
+#
+# ============================================================

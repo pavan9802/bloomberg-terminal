@@ -1,0 +1,130 @@
+# ============================================================
+# DOCKER COMPOSE - Run Multiple Containers Together
+# ============================================================
+# docker-compose lets you define and run multiple containers
+# as a single "application". Instead of running separate docker
+# commands for frontend and backend, you run one command:
+#
+#   docker-compose up
+#
+# This file defines:
+#   - backend: Spring Boot API server (port 8080)
+#   - frontend: React app served by nginx (port 80 -> 3000)
+#
+# The containers can communicate using service names as hostnames.
+# For example, frontend can reach backend at "http://backend:8080"
+# ============================================================
+
+# Version of docker-compose file format
+# "3.8" is a stable, widely-supported version
+version: "3.8"
+
+# ============================================================
+# SERVICES - Define each container
+# ============================================================
+services:
+  # ----------------------------------------------------------
+  # BACKEND SERVICE - Spring Boot API
+  # ----------------------------------------------------------
+  backend:
+    # "build" tells Docker to build an image from a Dockerfile
+    # instead of pulling a pre-built image from Docker Hub
+    build:
+      # "context" is the folder containing the Dockerfile
+      # and files to copy into the image
+      context: ./backend
+
+      # "dockerfile" specifies which Dockerfile to use
+      # (defaults to "Dockerfile" if not specified)
+      dockerfile: Dockerfile
+
+    # "container_name" gives the container a friendly name
+    # Without this, Docker generates a random name
+    container_name: bloomberg-backend
+
+    # "ports" maps container ports to your computer's ports
+    # Format: "HOST_PORT:CONTAINER_PORT"
+    #
+    # "8080:8080" means:
+    # - Container listens on port 8080 (inside Docker)
+    # - Your computer can access it on localhost:8080
+    ports:
+      - "8080:8080"
+
+    # "environment" sets environment variables in the container
+    # These override application.properties settings
+    environment:
+      # Spring profile to use (could be "dev", "prod", etc.)
+      - SPRING_PROFILES_ACTIVE=prod
+
+    # "healthcheck" tells Docker how to check if the app is ready
+    # Docker will mark the container as "healthy" or "unhealthy"
+    healthcheck:
+      # Command to run - curl the Spring Boot actuator endpoint
+      # "|| exit 1" means: if curl fails, exit with error code 1
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api/market/price/AAPL"]
+
+      # How often to run the check (every 30 seconds)
+      interval: 30s
+
+      # How long to wait for the check to complete
+      timeout: 10s
+
+      # How many failures before marking as unhealthy
+      retries: 3
+
+      # Wait this long before first check (let app start up)
+      start_period: 40s
+
+    # "restart" policy - what to do if container crashes
+    # "unless-stopped" = restart automatically unless you manually stop it
+    restart: unless-stopped
+
+  # ----------------------------------------------------------
+  # FRONTEND SERVICE - React + nginx
+  # ----------------------------------------------------------
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+
+    container_name: bloomberg-frontend
+
+    # Map port 80 (nginx inside container) to 3000 on your computer
+    # Access the app at http://localhost:3000
+    ports:
+      - "3000:80"
+
+    # "depends_on" specifies startup order
+    # Frontend waits for backend to start first
+    #
+    # Note: This only waits for container START, not for the app
+    # to be fully ready. For that, use healthcheck + condition.
+    depends_on:
+      - backend
+
+    restart: unless-stopped
+
+# ============================================================
+# HOW TO USE
+# ============================================================
+#
+# Build and start everything:
+#   docker-compose up --build
+#
+# Start in background (detached mode):
+#   docker-compose up -d
+#
+# Stop everything:
+#   docker-compose down
+#
+# View logs:
+#   docker-compose logs -f
+#
+# Rebuild just one service:
+#   docker-compose up --build frontend
+#
+# Access the app:
+#   Frontend: http://localhost:3000
+#   Backend API: http://localhost:8080/api/market/price/AAPL
+# ============================================================

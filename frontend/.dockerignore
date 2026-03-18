@@ -1,0 +1,52 @@
+# ============================================================
+# FRONTEND .dockerignore
+# ============================================================
+# Ignore files when building the Docker image.
+# These files are either:
+# - Regenerated during build (node_modules, dist)
+# - Not needed at runtime (docs, tests)
+# - Potentially sensitive (.env)
+# ============================================================
+
+# Dependencies (installed fresh via npm ci)
+node_modules/
+
+# Build output (generated during Docker build)
+dist/
+
+# Environment files (may contain secrets!)
+# Use Docker build args instead
+.env
+.env.*
+
+# IDE settings
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Git
+.git/
+.gitignore
+
+# Documentation
+*.md
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Test and coverage
+coverage/
+*.test.ts
+*.test.tsx
+*.spec.ts
+*.spec.tsx
+__tests__/
+
+# TypeScript build info (regenerated)
+*.tsbuildinfo
+
+# Logs
+*.log
+npm-debug.log*
