@@ -2,33 +2,28 @@
 # NGINX CONFIGURATION - Web Server for React App
 # ============================================================
 # Serves static files and handles SPA routing.
-# API calls go directly to backend via VITE_API_URL.
+# Uses PORT environment variable for Railway compatibility.
 # ============================================================
 
 server {
-    listen 80;
+    # Use PORT env variable (Railway sets this), default to 80
+    listen ${PORT};
     server_name _;
     root /usr/share/nginx/html;
     index index.html;
 
-    # --------------------------------------------------------
-    # GZIP COMPRESSION - Smaller downloads
-    # --------------------------------------------------------
+    # GZIP COMPRESSION
     gzip on;
     gzip_types text/plain text/css application/json application/javascript text/xml application/xml;
     gzip_min_length 1000;
 
-    # --------------------------------------------------------
-    # STATIC FILE CACHING - Faster repeat visits
-    # --------------------------------------------------------
+    # STATIC FILE CACHING
     location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2)$ {
         expires 1y;
         add_header Cache-Control "public, immutable";
     }
 
-    # --------------------------------------------------------
     # SPA ROUTING - All routes serve index.html
-    # --------------------------------------------------------
     location / {
         try_files $uri $uri/ /index.html;
     }

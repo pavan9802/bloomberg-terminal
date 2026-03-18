@@ -71,18 +71,18 @@ FROM nginx:alpine
 # /usr/share/nginx/html is where nginx looks for files to serve.
 COPY --from=build /app/dist /usr/share/nginx/html
 
-# Copy custom nginx configuration.
-# This handles:
-# - Single Page App routing (all routes serve index.html)
-# - Gzip compression (smaller file transfers)
-# - Caching headers (faster repeat visits)
-# - Proxy API requests to backend (in docker-compose setup)
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Copy nginx config template.
+# We use a template because Railway sets a dynamic PORT variable.
+# The ${PORT} placeholder will be replaced at container startup.
+COPY nginx.conf.template /etc/nginx/nginx.conf.template
 
-# Document that nginx listens on port 80 (standard HTTP port)
-EXPOSE 80
+# Set default port (Railway will override this)
+ENV PORT=80
 
-# Start nginx in the foreground.
-# - "daemon off" keeps nginx in foreground (required for Docker)
-# - Without this, the container would exit immediately
-CMD ["nginx", "-g", "daemon off;"]
+# Start nginx with environment variable substitution.
+# 1. "envsubst" replaces ${PORT} in the template with actual value
+# 2. Output is written to the nginx config file
+# 3. "nginx" starts serving
+#
+# We use "sh -c" to run multiple commands in sequence.
+CMD sh -c "envsubst '\$PORT' < /etc/nginx/nginx.conf.template > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"
