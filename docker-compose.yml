@@ -87,6 +87,10 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      # Pass the backend URL for local development
+      # The browser calls localhost:8080 (the mapped port)
+      args:
+        VITE_API_URL: "http://localhost:8080"
 
     container_name: bloomberg-frontend
 
