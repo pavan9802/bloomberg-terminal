@@ -59,9 +59,10 @@ export default function WatchList() {
         styles={{
           input: {
             background: "#111",
-            color: "#ccc",
+            color: "#cbd5e1",
             border: "1px solid #333",
             fontSize: "11px",
+            fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
           },
           dropdown: {
             background: "#111",
@@ -69,7 +70,7 @@ export default function WatchList() {
           },
           option: {
             fontSize: "11px",
-            color: "#ccc",
+            color: "#cbd5e1",
           },
         }}
       />

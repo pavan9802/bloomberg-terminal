@@ -6,8 +6,8 @@
 
 body {
   background-color: #0a0a0a;
-  color: #f59e0b;
-  font-family: 'Courier New', Courier, monospace;
+  color: #cbd5e1;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-size: 13px;
 }
 
@@ -26,15 +26,15 @@ body {
   padding: 0 1rem;
   height: 40px;
   background: #111;
-  border-bottom: 1px solid #f59e0b;
+  border-bottom: 1px solid #0d9488;
   flex-shrink: 0;
 }
 
 .dashboard-title {
   font-size: 14px;
-  font-weight: bold;
-  letter-spacing: 2px;
-  color: #f59e0b;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  color: #2dd4bf;
 }
 
 .toolbar-actions {
@@ -43,17 +43,18 @@ body {
 
 .add-widget-btn {
   background: transparent;
-  border: 1px solid #f59e0b;
-  color: #f59e0b;
+  border: 1px solid #2dd4bf;
+  color: #2dd4bf;
   padding: 4px 10px;
   font-family: inherit;
   font-size: 11px;
   cursor: pointer;
-  letter-spacing: 1px;
+  letter-spacing: 0.25px;
+  transition: all 0.15s ease;
 }
 
 .add-widget-btn:hover {
-  background: #f59e0b;
+  background: #2dd4bf;
   color: #0a0a0a;
 }
 
@@ -70,8 +71,8 @@ body {
 .add-widget-menu-section {
   padding: 6px 12px 3px;
   font-size: 9px;
-  letter-spacing: 1px;
-  color: #555;
+  letter-spacing: 0.5px;
+  color: #475569;
   border-top: 1px solid #1e1e1e;
 }
 
@@ -85,16 +86,17 @@ body {
   padding: 8px 12px;
   background: transparent;
   border: none;
-  color: #ccc;
+  color: #cbd5e1;
   font-family: inherit;
   font-size: 12px;
   text-align: left;
   cursor: pointer;
+  transition: all 0.1s ease;
 }
 
 .add-widget-menu button:hover {
   background: #1e1e1e;
-  color: #f59e0b;
+  color: #5eead4;
 }
 
 .dashboard-grid {
@@ -117,22 +119,22 @@ body {
   width: 5px;
   background: #1e1e1e;
   cursor: col-resize;
-  transition: background 0.15s;
+  transition: background 0.15s ease;
 }
 
 .resize-handle-col[data-separator]:hover {
-  background: #f59e0b;
+  background: #2dd4bf;
 }
 
 .resize-handle-row {
   height: 5px;
   background: #1e1e1e;
   cursor: row-resize;
-  transition: background 0.15s;
+  transition: background 0.15s ease;
 }
 
 .resize-handle-row[data-separator]:hover {
-  background: #f59e0b;
+  background: #2dd4bf;
 }
 
 .widget-header {
@@ -147,8 +149,8 @@ body {
 
 .widget-title {
   font-size: 11px;
-  letter-spacing: 1px;
-  color: #888;
+  letter-spacing: 0.25px;
+  color: #64748b;
 }
 
 .widget-controls {
@@ -160,7 +162,7 @@ body {
 .widget-controls button {
   background: transparent;
   border: 1px solid #333;
-  color: #666;
+  color: #64748b;
   width: 20px;
   height: 20px;
   font-size: 10px;
@@ -169,11 +171,12 @@ body {
   align-items: center;
   justify-content: center;
   padding: 0;
+  transition: all 0.1s ease;
 }
 
 .widget-controls button:hover:not(:disabled) {
-  border-color: #f59e0b;
-  color: #f59e0b;
+  border-color: #2dd4bf;
+  color: #5eead4;
 }
 
 .widget-controls button:disabled {
@@ -188,7 +191,7 @@ body {
 
 .widget-size {
   font-size: 10px;
-  color: #444;
+  color: #475569;
   width: 22px;
   text-align: center;
 }
@@ -200,19 +203,19 @@ body {
 
 /* ── ReactSearchBox overrides ── */
 .watchlist input {
-  font-family: 'Courier New', Courier, monospace;
-  letter-spacing: 1px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  letter-spacing: 0.25px;
   border-radius: 0 !important;
 }
 
 .watchlist input::placeholder {
-  color: #444;
+  color: #475569;
 }
 
 .watchlist input:focus {
   outline: none;
-  border-color: #f59e0b !important;
-  box-shadow: 0 0 0 1px #f59e0b !important;
+  border-color: #2dd4bf !important;
+  box-shadow: 0 0 0 1px #2dd4bf !important;
 }
 
 .react-search-box-dropdown {
@@ -225,16 +228,16 @@ body {
 
 .react-search-box-dropdown-list-item {
   background-color: #111 !important;
-  color: #888;
-  font-family: 'Courier New', Courier, monospace;
+  color: #64748b;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-size: 11px;
-  letter-spacing: 1px;
+  letter-spacing: 0.25px;
   height: 30px !important;
   border-color: #222 !important;
 }
 
 .react-search-box-dropdown-list-item:hover {
-  color: #f59e0b !important;
+  color: #5eead4 !important;
 }
 
 /* ── PriceWidget ── */
@@ -255,8 +258,8 @@ body {
 .watchlist-header {
   padding: 6px 10px;
   font-size: 10px;
-  letter-spacing: 1px;
-  color: #555;
+  letter-spacing: 0.5px;
+  color: #475569;
   border-bottom: 1px solid #1e1e1e;
 }
 
@@ -267,7 +270,7 @@ body {
   padding: 8px 10px;
   cursor: pointer;
   border-bottom: 1px solid #161616;
-  transition: background 0.1s;
+  transition: background 0.1s ease;
 }
 
 .watchlist-item:hover {
@@ -275,14 +278,14 @@ body {
 }
 
 .watchlist-item.active {
-  background: #1a1500;
-  border-left: 2px solid #f59e0b;
+  background: #042f2e;
+  border-left: 2px solid #2dd4bf;
 }
 
 .wl-symbol {
-  font-weight: bold;
+  font-weight: 600;
   font-size: 12px;
-  color: #f59e0b;
+  color: #2dd4bf;
 }
 
 .watchlist-error {
@@ -294,7 +297,7 @@ body {
 .watchlist-empty {
   padding: 16px 10px;
   font-size: 11px;
-  color: #555;
+  color: #475569;
   text-align: center;
   line-height: 1.5;
 }
@@ -307,12 +310,12 @@ body {
 
 .wl-price {
   font-size: 11px;
-  color: #888;
+  color: #64748b;
 }
 
 /* shared base for all remove buttons */
 .remove-btn {
-  color: #555 !important;
+  color: #475569 !important;
   background: transparent !important;
 }
 
@@ -324,7 +327,7 @@ body {
 /* watchlist variant — hidden until row hover */
 .wl-remove {
   opacity: 0;
-  transition: opacity 0.15s;
+  transition: opacity 0.15s ease;
 }
 
 .watchlist-item:hover .wl-remove {
@@ -351,7 +354,7 @@ body {
   align-items: center;
   justify-content: center;
   font-size: 11px;
-  color: #555;
+  color: #475569;
 }
 
 .chart-toolbar {
@@ -371,13 +374,13 @@ body {
 
 .chart-symbol-name {
   font-size: 12px;
-  font-weight: bold;
-  color: #f59e0b;
+  font-weight: 600;
+  color: #2dd4bf;
 }
 
 .chart-symbol-price {
   font-size: 11px;
-  color: #888;
+  color: #64748b;
 }
 
 .chart-periods {
@@ -398,23 +401,23 @@ body {
 .chart-period-btn {
   background: none;
   border: 1px solid #2a2a2a;
-  color: #555;
-  font-family: 'Courier New', Courier, monospace;
+  color: #475569;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-size: 10px;
   padding: 2px 8px;
   cursor: pointer;
-  letter-spacing: 0.5px;
-  transition: all 0.1s;
+  letter-spacing: 0.25px;
+  transition: all 0.1s ease;
 }
 
 .chart-period-btn:hover {
   border-color: #444;
-  color: #888;
+  color: #64748b;
 }
 
 .chart-period-btn.active {
-  border-color: #f59e0b;
-  color: #f59e0b;
+  border-color: #2dd4bf;
+  color: #2dd4bf;
 }
 
 .chart-canvas {
@@ -438,7 +441,7 @@ body {
   align-items: center;
   justify-content: center;
   height: 100%;
-  color: #444;
+  color: #475569;
   font-size: 12px;
 }
 
@@ -453,13 +456,13 @@ body {
 
 .chart-symbol {
   font-size: 18px;
-  font-weight: bold;
-  color: #f59e0b;
+  font-weight: 600;
+  color: #2dd4bf;
 }
 
 .chart-price {
   font-size: 20px;
-  color: #fff;
+  color: #f1f5f9;
 }
 
 .chart-change {
@@ -469,6 +472,6 @@ body {
 .chart-period {
   margin-left: auto;
   font-size: 10px;
-  color: #444;
-  letter-spacing: 1px;
+  color: #475569;
+  letter-spacing: 0.5px;
 }

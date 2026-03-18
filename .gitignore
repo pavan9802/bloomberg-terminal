@@ -17,3 +17,9 @@ frontend/package-lock.json
 .idea/
 .vscode/
 *.iml
+
+# Claude
+.agents/
+.claude/
+skills-lock.json
+CLAUDE.md

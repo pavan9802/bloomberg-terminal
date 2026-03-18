@@ -7,14 +7,29 @@ import { PERIODS, Period, ChartState } from "../types/chart";
 
 function applyBars(series: ISeriesApi<"Area">, bars: PriceBar[]) {
   if (bars.length === 0) return;
-  const isUp = bars[bars.length - 1].price >= bars[0].price;
-  const color = isUp ? "#22c55e" : "#ef4444";
+
+  // Deduplicate by date (keep last value for each date) and ensure numeric price
+  const dedupedMap = new Map<string, number>();
+  for (const b of bars) {
+    if (b.date && b.price != null) {
+      dedupedMap.set(b.date, Number(b.price));
+    }
+  }
+
+  // Convert to sorted array
+  const cleanBars = Array.from(dedupedMap.entries())
+    .sort((a, b) => a[0].localeCompare(b[0]))
+    .map(([date, price]) => ({ time: date as any, value: price }));
+
+  if (cleanBars.length === 0) return;
+
+  const isUp = cleanBars[cleanBars.length - 1].value >= cleanBars[0].value;
   series.applyOptions({
-    lineColor: color,
-    topColor: isUp ? "rgba(34, 197, 94, 0.2)" : "rgba(239, 68, 68, 0.2)",
-    bottomColor: isUp ? "rgba(34, 197, 94, 0.01)" : "rgba(239, 68, 68, 0.01)",
+    lineColor: isUp ? "#2dd4bf" : "#64748b",
+    topColor: isUp ? "rgba(45, 212, 191, 0.2)" : "rgba(100, 116, 139, 0.2)",
+    bottomColor: isUp ? "rgba(45, 212, 191, 0.01)" : "rgba(100, 116, 139, 0.01)",
   });
-  series.setData(bars.map(b => ({ time: b.date as any, value: b.price })));
+  series.setData(cleanBars);
 }
 
 export default function PriceChart() {
@@ -40,7 +55,8 @@ export default function PriceChart() {
     const chart = createChart(containerRef.current, {
       layout: {
         background: { type: ColorType.Solid, color: "#0a0a0a" },
-        textColor: "#555",
+        textColor: "#64748b",
+        fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
       },
       grid: {
         vertLines: { color: "#1a1a1a" },
@@ -57,9 +73,9 @@ export default function PriceChart() {
     });
 
     const series = chart.addSeries(AreaSeries, {
-      lineColor: "#22c55e",
-      topColor: "rgba(34, 197, 94, 0.2)",
-      bottomColor: "rgba(34, 197, 94, 0.01)",
+      lineColor: "#2dd4bf",
+      topColor: "rgba(45, 212, 191, 0.2)",
+      bottomColor: "rgba(45, 212, 191, 0.01)",
       lineWidth: 2,
     });
 
