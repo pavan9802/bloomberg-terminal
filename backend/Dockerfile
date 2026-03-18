@@ -14,13 +14,13 @@
 # "FROM" tells Docker which base image to start from.
 # Think of it as choosing an operating system with pre-installed software.
 #
-# eclipse-temurin:21-jdk = Java 21 JDK (Java Development Kit)
-# - "eclipse-temurin" is a popular free Java distribution
-# - "21" is the Java version (matches your pom.xml)
-# - "jdk" means it includes compiler tools (needed to build)
+# maven:3.9-eclipse-temurin-21 = Maven + Java 21 JDK
+# - "maven" is the build tool for Java (like npm for Node)
+# - "3.9" is the Maven version
+# - "eclipse-temurin-21" means it includes Java 21
 #
 # "AS build" names this stage so we can reference it later
-FROM eclipse-temurin:21-jdk AS build
+FROM maven:3.9-eclipse-temurin-21 AS build
 
 # "WORKDIR" sets the working directory inside the container.
 # All following commands run from this directory.
