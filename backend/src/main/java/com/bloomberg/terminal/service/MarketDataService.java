@@ -9,9 +9,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import com.bloomberg.terminal.client.YahooFinanceClient;
+import com.bloomberg.terminal.config.CacheConfig;
 import com.bloomberg.terminal.model.PriceBar;
 import com.bloomberg.terminal.model.StockSnapshot;
 import com.bloomberg.terminal.model.YahooFinanceChartResponse.Chart.Result;
@@ -27,8 +29,9 @@ public class MarketDataService {
     private final YahooFinanceClient yahooFinanceClient;
     private static final ZoneId NY = ZoneId.of("America/New_York");
 
+    @Cacheable(value = CacheConfig.CACHE_SEARCH, key = "#query.toUpperCase()", unless = "#result == null")
     public Set<String> searchSymbols(String query) {
-        log.info("Searching symbols for query: {}", query);
+        log.debug("Cache MISS - searching symbols for query: {}", query);
         return yahooFinanceClient.searchSymbols(query)
                 .map(response -> {
                     if (response.getQuotes() == null) {
@@ -44,8 +47,9 @@ public class MarketDataService {
                 .orElse(Set.of());
     }
 
+    @Cacheable(value = CacheConfig.CACHE_PRICE, key = "#symbol.toUpperCase()", unless = "#result == null")
     public StockSnapshot getPrice(String symbol) {
-        log.info("Fetching price for symbol: {}", symbol);
+        log.debug("Cache MISS - fetching price for symbol: {}", symbol);
         return yahooFinanceClient.getChart(symbol)
                 .map(response -> {
                     Result result = firstResult(response, symbol);
@@ -70,8 +74,11 @@ public class MarketDataService {
                 .orElse(null);
     }
 
+    @Cacheable(value = CacheConfig.CACHE_HISTORY,
+               key = "T(String).format('%s-%s-%s', #symbol.toUpperCase(), #interval, #range)",
+               unless = "#result == null")
     public List<PriceBar> getHistory(String symbol, String interval, String range) {
-        log.info("Fetching price history for symbol: {}", symbol);
+        log.debug("Cache MISS - fetching price history for symbol: {}", symbol);
         return yahooFinanceClient.getHistory(symbol, interval, range)
                 .map(response -> {
                     Result result = firstResult(response, symbol);
