@@ -71,18 +71,16 @@ FROM nginx:alpine
 # /usr/share/nginx/html is where nginx looks for files to serve.
 COPY --from=build /app/dist /usr/share/nginx/html
 
-# Copy nginx config template.
-# We use a template because Railway sets a dynamic PORT variable.
-# The ${PORT} placeholder will be replaced at container startup.
-COPY nginx.conf.template /etc/nginx/nginx.conf.template
+# Copy startup script that configures nginx with the correct PORT
+COPY start.sh /start.sh
+RUN chmod +x /start.sh
 
-# Set default port (Railway will override this)
+# Set default port (Railway will override this via environment variable)
 ENV PORT=80
 
-# Start nginx with environment variable substitution.
-# 1. "envsubst" replaces ${PORT} in the template with actual value
-# 2. Output is written to the nginx config file
-# 3. "nginx" starts serving
-#
-# We use "sh -c" to run multiple commands in sequence.
-CMD sh -c "envsubst '\$PORT' < /etc/nginx/nginx.conf.template > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"
+# Run the startup script
+# This script:
+# 1. Reads the PORT environment variable
+# 2. Creates nginx config with that port
+# 3. Starts nginx
+CMD ["/start.sh"]
